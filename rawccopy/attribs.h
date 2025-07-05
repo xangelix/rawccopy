@@ -185,11 +185,11 @@ typedef struct _run_list_iterator {
 #define ATTR_IS_SPARSE 0x8000
 
 
-wchar_t* type_names[];
+extern wchar_t* type_names[];
 
 #define AttributeTypeName(type) (type_names[AttrTypeToIndex((uint32_t)(type))])
 
-const wchar_t* namespaces[];
+extern const wchar_t* namespaces[];
 
 #define NameSpaceLabel(ns) namespaces[(uint8_t)(ns)]
 
