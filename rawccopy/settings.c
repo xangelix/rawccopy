@@ -5,7 +5,7 @@
 
 #include "safe-string.h"
 #include "disk-info.h"
-#include "Shlwapi.h"
+#include "shlwapi.h"
 #include "ut-wrapper.h"
 #include "settings.h"
 #include "fileio.h"

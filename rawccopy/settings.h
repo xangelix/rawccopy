@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "Shlwapi.h"
+#include "shlwapi.h"
 
 #include "helpers.h"
 #include "safe-string.h"
