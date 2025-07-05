@@ -4,9 +4,6 @@
 #include "attribs.h"
 
 
-const uint32_t SYMLINK_FLAG_RELATIVE = 0x00000001;  /* The substitute name is a path name relative to the
-													   directory containing the symbolic link. */
-
 #pragma pack (push, 1)
 struct _reparse_point {
 	/*0x00*/ uint32_t reparse_tag;				/* Reparse tag, must be IO_REPARSE_TAG_SYMLINK or IO_REPARSE_TAG_MOUNT_POINT*/
