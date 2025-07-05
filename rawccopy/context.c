@@ -18,9 +18,17 @@ execution_context SetupContext(int argc, char* argv[])
 
 	result->cluster_sz = (uint32_t)(result->boot->bytes_per_sector * result->boot->sectors_per_cluster);
 
-	result->mft_record_sz = result->boot->clusters_per_file_record < 0 ?
-		(1L << (256 - (uint32_t)(result->boot)->clusters_per_file_record)) :
-		result->cluster_sz * result->boot->clusters_per_file_record;
+	int8_t cpr = result->boot->clusters_per_file_record;
+	if (cpr < 0)
+	{
+		// If negative, size is 2 to the power of the absolute value
+		result->mft_record_sz = (1UL << -cpr);
+	}
+	else
+	{
+		// If positive, size is in clusters
+		result->mft_record_sz = result->cluster_sz * cpr;
+	}
 
 	if (result->parameters->write_boot_info)
 	{
