@@ -60,13 +60,13 @@ settings Parse(int argc, char* argv[])
 		if (result->tcp_send)
 		{
 			if (!ParseIPDestination(out_path, &result->ip_address, &result->tcp_port))
-				return ErrorCleanUp(DeleteSettings, result, "Error: Configuration of TcpSend failed.\n");
+				return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Error: Configuration of TcpSend failed.\n");
 		}
 		else if (PathFileExistsA(out_path))
 			result->output_folder = StringPrint(NULL, 0, L"%hs", out_path);
 	}
 	if (!result->output_folder && !(result->output_folder = ExecutablePath()))
-		return ErrorCleanUp(DeleteSettings, result, "Invalid output path.\n");
+		return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Invalid output path.\n");
 
 	if (out_name && *out_name)
 	{
@@ -94,7 +94,7 @@ settings Parse(int argc, char* argv[])
 	{
 		if (*raw_dir_mode < '0' || *raw_dir_mode > '2')
 		{
-			ErrorCleanUp(DeleteSettings, result, "Error: RawDirMode must be an integer from 0 - 2.\n");
+			ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Error: RawDirMode must be an integer from 0 - 2.\n");
 			PrintHelp();
 			return NULL;
 		}
@@ -107,7 +107,7 @@ settings Parse(int argc, char* argv[])
 		image_vol = strtoul(image_volume, NULL, 10);
 		if (!image_vol)
 		{
-			ErrorCleanUp(DeleteSettings, result,"Error: ImageNtfsVolume must be a digit starting from 1.\n");
+			ErrorCleanUp((void (*)(void*))DeleteSettings, result,"Error: ImageNtfsVolume must be a digit starting from 1.\n");
 			PrintHelp();
 			return NULL;
 		}
@@ -126,18 +126,18 @@ settings Parse(int argc, char* argv[])
 	if (image_file && *image_file)
 	{
 		if (!PathFileExistsA(image_file))
-			return ErrorCleanUp(DeleteSettings, result, "Error: Image file not found: %s\n", image_file);
+			return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Error: Image file not found: %s\n", image_file);
 		
 		result->source_drive = StringPrint(NULL, 0, L"%ls%hs", strncmp(image_file, "\\\\.\\", 4) ? L"\\\\.\\" : L"", image_file);
 		if (!VerifyVolumeInfo(result->source_drive, image_vol, &result->image_offs))
-			return ErrorCleanUp(DeleteSettings, result, "");
+			return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "");
 
 		result->is_image = true;
 	}
 
 	if (!file_name_path || !*file_name_path)
 	{
-		return ErrorCleanUp(DeleteSettings, result, "Error: FileNamePath parameter not specified.\n");
+		return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Error: FileNamePath parameter not specified.\n");
 	}
 
 	char* tail = NULL;
@@ -160,7 +160,7 @@ settings Parse(int argc, char* argv[])
 		if (!VerifyVolumeInfo(image, image_vol, &vol_offset))
 		{
 			DeleteString(image);
-			return ErrorCleanUp(DeleteSettings, result, "Error: No NTFS found on physical drive.\n");
+			return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Error: No NTFS found on physical drive.\n");
 		}
 		if (result->source_drive)
 			DeleteString(result->source_drive);
@@ -203,7 +203,7 @@ settings Parse(int argc, char* argv[])
 		// We do accpet 'FileNamePath:\...\...\...', which we'll patch up ourselves,
 		// all the rest triggers an error, but not the original rawcopy error message.
 		if (file_name_path[1] != ':' && file_name_path[0] != '\\')
-			return ErrorCleanUp(DeleteSettings, result, "Incorrectly formatted file name path: %s\n", file_name_path);
+			return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Incorrectly formatted file name path: %s\n", file_name_path);
 
 		result->source_path = StringPrint(NULL, 0, L"%ls%hs", file_name_path[0] == '\\' ? L"x:" : L"", file_name_path);
 	}
@@ -227,7 +227,7 @@ settings Parse(int argc, char* argv[])
 	}
 	else if (file_name_path[1] != ':')
 		//Don't know what this is; in any case it's messed up:
-		return ErrorCleanUp(DeleteSettings, result, "Incorrectly formatted file name path: %s\n", file_name_path);
+		return ErrorCleanUp((void (*)(void*))DeleteSettings, result, "Incorrectly formatted file name path: %s\n", file_name_path);
 	else
 	{
 		// Final option is a bit exotic: normal file path, correctly formatted, but 

@@ -50,7 +50,7 @@ void DeleteStep(path_step step)
 }
 
 static const path_step dummy;
-static const UT_icd ut_step_icd = { sizeof(*dummy) , NULL, NULL, DeleteStep };
+static const UT_icd ut_step_icd = { sizeof(*dummy) , NULL, NULL, (void (*)(void*))DeleteStep };
 
 resolved_path CopyPath(const resolved_path pt)
 {
@@ -94,7 +94,7 @@ bool GoDown(execution_context context, resolved_path pt, const wchar_t* item)
 	{
 		next_deref = GetLinkedEntry(context, pt, IndexEntryPtr(next_orig));
 		if (!next_deref)
-			return CleanUpAndFail(DeleteBytes, next_orig, "");
+			return CleanUpAndFail((void (*)(void*))DeleteBytes, next_orig, "");
 	}
 
 	path_step next = CreateStep(next_orig, next_deref);
@@ -159,7 +159,7 @@ bytes GetLinkedEntry(const execution_context context, const resolved_path pt, co
 
 	attribute at = FirstAttribute(context, rec, AttrTypeFlag(ATTR_REPARSE_POINT));
 	if (!at)
-		return ErrorCleanUp(DeleteMFTFile, rec, "Record is not a valid link: %lld\n", link->mft_reference);
+		return ErrorCleanUp((void (*)(void*))DeleteMFTFile, rec, "Record is not a valid link: %lld\n", link->mft_reference);
 
 	bytes raw_link = GetBytesFromAttrib(context, rec, at, 0, AttributeSize(at));
 

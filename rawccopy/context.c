@@ -14,7 +14,7 @@ execution_context SetupContext(int argc, char* argv[])
 		return ErrorCleanUp(free, result, "");
 
 	if (!(result->boot = ReadFromDisk(result->parameters->source_drive, result->parameters->image_offs)))
-		return ErrorCleanUp(CleanUp, result, "");
+		return ErrorCleanUp((void (*)(void*))CleanUp, result, "");
 
 	result->cluster_sz = (uint32_t)(result->boot->bytes_per_sector * result->boot->sectors_per_cluster);
 
@@ -43,13 +43,13 @@ execution_context SetupContext(int argc, char* argv[])
 	}
 
 	if (!(result->dr = OpenDiskReader(result->parameters->source_drive, result->boot->bytes_per_sector)))
-		return ErrorCleanUp(CleanUp, result, "");
+		return ErrorCleanUp((void (*)(void*))CleanUp, result, "");
 
 	if (!(result->mft_table = LoadMFTFile(result, MASTER_FILE_TABLE_NUMBER)))
-		return ErrorCleanUp(CleanUp, result, "");
+		return ErrorCleanUp((void (*)(void*))CleanUp, result, "");
 
 	if (!SetUppercaseList(result))
-		return ErrorCleanUp(CleanUp, result, "");
+		return ErrorCleanUp((void (*)(void*))CleanUp, result, "");
 
 	return result;
 }
@@ -77,8 +77,9 @@ bool SetUppercaseList(execution_context context)
 	return result;
 }
 
-void CleanUp(execution_context context)
+void CleanUp(void* context_ptr)
 {
+    execution_context context = (execution_context)context_ptr;
 	if (context->boot)
 		free(context->boot);
 

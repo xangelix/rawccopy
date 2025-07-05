@@ -153,7 +153,7 @@ bool ExtractAttributes(execution_context context, const string file_name, uint64
 			printf("Using %ls instead.\n", anon_name);
 			local_name = StringPrint(NULL, 0, L"%ls", anon_name);
 			if (!local_name)
-				return CleanUpAndFail(DeleteMFTFile, file, "");
+				return CleanUpAndFail((void (*)(void*))DeleteMFTFile, file, "");
 		}
 	}
 	

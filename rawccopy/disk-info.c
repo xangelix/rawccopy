@@ -9,7 +9,7 @@
 #pragma pack (push, 1)
 typedef struct {
     /* 0x00 */	uint8_t	status;         /*  Status or physical drive (bit 7 set is for active or bootable, old MBRs only accept
-                                            0x80, 0x00 means inactive, and 0x01–0x7F stand for invalid) */
+                                            0x80, 0x00 means inactive, and 0x01ï¿½0x7F stand for invalid) */
     /* 0x01 */	uint8_t	start_CHS[3];   /*  Address of first absolute sector in partition, described in three bytes. */
     /* 0x04 */	uint8_t	type;           /*  Partition type */
     /* 0x05 */	uint8_t	end_CHS[3];     /*  Address of last absolute sector in partition, described in three bytes. */
@@ -87,7 +87,7 @@ bool VerifyVolumeInfo(const string volume_name, uint64_t index, uint64_t* volume
 
     bytes mbr = GetBytesFromDiskRdr(dr, 0, sizeof(struct _mbr_record));
     if (!mbr)
-        return CleanUpAndFail(CloseDiskReader, dr, "");
+        return CleanUpAndFail((void (*)(void*))CloseDiskReader, dr, "");
 
     partition_info* part1 = &(TYPE_CAST(mbr, mbr_record)->partitions[0]);
     UT_array *vols = NULL;
@@ -163,7 +163,7 @@ UT_array* GPTVolumes(disk_reader dr)
         return NULL;
 
     if (strcmp(TYPE_CAST(gpt, GPT_hdr)->signature, "EFI PART"))
-        return ErrorCleanUp(DeleteBytes, gpt, "Error: Could not find GPT signature: %.*s\n", 8, TYPE_CAST(gpt, GPT_hdr)->signature);
+        return ErrorCleanUp((void (*)(void*))DeleteBytes, gpt, "Error: Could not find GPT signature: %.*s\n", 8, TYPE_CAST(gpt, GPT_hdr)->signature);
 
     UT_array* vols;
     utarray_new(vols, &vol_icd);
@@ -231,7 +231,7 @@ boot_sector ReadFromDisk(const string drive, uint64_t offset)
     bytes sector = CreateEmpty();
 
     if (!ReadNTFSBootSector(dr, offset, sector))
-        return ErrorCleanUp(DeleteBytes, sector, "");   
+        return ErrorCleanUp((void (*)(void*))DeleteBytes, sector, "");   
 
     result = TYPE_CAST(sector, boot_sector);
     free(sector);

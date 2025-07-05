@@ -129,20 +129,20 @@ bytes GetRawMFTRecord(const execution_context context, uint64_t index)
 
 	if (!DoFixUp(result, context->boot->bytes_per_sector))
 	{
-		return ErrorCleanUp(DeleteBytes, result, "MFT record %lld failed fix-up.\n", index);
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "MFT record %lld failed fix-up.\n", index);
 	}
 
 	//Now recast it to an actual MFT record and do some further checks:
 	raw_mft_record rec = (raw_mft_record)result->buffer;
 
 	if (strncmp(rec->magic, (unsigned char*)RecordSignature, 4))
-		return ErrorCleanUp(DeleteBytes, result, "MFT record signature not found.\n");
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "MFT record signature not found.\n");
 
 	if (!(rec->flags & MFT_RECORD_IN_USE))
-		return ErrorCleanUp(DeleteBytes, result, "MFT record not found: %lld\n", index);
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "MFT record not found: %lld\n", index);
 
 	if (rec->mft_rec_number != index)
-		return ErrorCleanUp(DeleteBytes, result, "Corrupt MFT record for index: %lld\n", index);
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "Corrupt MFT record for index: %lld\n", index);
 
 	return result;
 }
@@ -177,13 +177,13 @@ mft_file LoadMFTFile(execution_context context, uint64_t index)
 		{
 			result->at_list = CreateEmpty();
 			if (!result->at_list || !AppendBytesFromRuns(context, at, AttributeSize(at), result->at_list, 0))
-				return ErrorCleanUp(DeleteMFTFile, result, "");
+				return ErrorCleanUp((void (*)(void*))DeleteMFTFile, result, "");
 		}
 		else
 		{
 			result->at_list = FromBuffer((uint8_t*)at + at->value_offs, at->value_len);
 			if (!result->at_list)
-				return ErrorCleanUp(DeleteMFTFile, result, "");
+				return ErrorCleanUp((void (*)(void*))DeleteMFTFile, result, "");
 		}
 	}
 
@@ -331,7 +331,7 @@ bytes GetBytesFromAttribRdr(execution_context context, attribute_reader rdr, int
 		return NULL;
 
 	if (!AppendBytesFromAttribRdr(context, rdr, offset, cnt, result, 0))
-		return ErrorCleanUp(DeleteBytes, result, "");
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "");
 
 	return result;
 }
@@ -556,7 +556,7 @@ bool AppendCompressedBytesFromAttribRdr(execution_context context, attribute_rea
 						Reserve(compr_bf, (rsize_t)block_sz_bt);
 						//Decompress the block starting at block_sz into the buffer:
 						if (!LZNT1Decompress(dest, (rsize_t)block_st, compr_bf, 0))
-							return CleanUpAndFail(DeleteBytes, compr_bf, "Decompression error.\n");
+							return CleanUpAndFail((void (*)(void*))DeleteBytes, compr_bf, "Decompression error.\n");
 
 						//Copy the result back into dest:
 						AppendAt(dest, (rsize_t)block_st, compr_bf, 0, (rsize_t)block_sz_bt);

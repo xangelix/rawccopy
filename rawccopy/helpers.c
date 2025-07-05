@@ -192,7 +192,7 @@ string ExecutablePath()
 		}
 
 	}
-	return ErrorCleanUp(DeleteBytes, result, "");
+	return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "");
 }
 
 int wstrncmp_nocase(const wchar_t* first, const wchar_t* second, size_t max)

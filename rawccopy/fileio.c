@@ -101,7 +101,7 @@ bytes GetBytesFromDiskRdr(disk_reader dr, int64_t offset, uint64_t cnt)
 		return NULL;
 
 	if (!AppendBytesFromDiskRdr(dr, offset, cnt, result, 0))
-		return ErrorCleanUp(DeleteBytes, result, "");
+		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "");
 
 	return result;
 }

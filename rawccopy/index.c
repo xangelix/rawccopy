@@ -193,7 +193,7 @@ index_iter StartIndexIterator(execution_context context, const index_entry root)
 	result->alloc_rdr = NULL;
 	attribute index_rt = NULL;
 	if (!IndexSetup(context, file, &index_rt, &result->alloc_rdr, &result->block_sz, &result->vcn_mult))
-		return ErrorCleanUp(CloseIndexIterator, result, "");
+		return ErrorCleanUp((void (*)(void*))CloseIndexIterator, result, "");
 
 	bytes root_node = FromBuffer(IndexNodeFromRootAttrib(index_rt), IndexNodeFromRootAttrib(index_rt)->index_length + sizeof(struct _index_header));
 	utarray_push_back(result->node_queue, &root_node);
@@ -234,7 +234,7 @@ bytes FindIndexEntry(execution_context context, uint64_t parent_mft, const wchar
 	uint64_t vcn_mult = 0;
 
 	if (!IndexSetup(context, rec, &root, &alloc_rdr, &block_sz, &vcn_mult))
-		return ErrorCleanUp(DeleteMFTFile, rec, "");
+		return ErrorCleanUp((void (*)(void*))DeleteMFTFile, rec, "");
 
 	UT_array* entry_lst;
 	utarray_new(entry_lst, &ut_ptr_icd);

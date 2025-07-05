@@ -24,6 +24,6 @@ typedef struct _execution_context
 
 execution_context SetupContext(int argc, char* argv[]);
 
-void CleanUp(execution_context context);
+void CleanUp(void* context_ptr);
 
 #endif //CONTEXT_H
