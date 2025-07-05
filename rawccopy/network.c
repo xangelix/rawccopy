@@ -46,11 +46,11 @@ bool ParseIPDestination(const char* destination, uint32_t *ip, uint16_t* port)
 			{
 				if (res->ai_family == AF_INET)
 				{
-					#pragma warning( push )
-					#pragma warning( disable : 4133 )
-					struct in_addr* ad = res->ai_addr->sa_data + 2;
-					#pragma warning( pop )
-					*ip = ad->S_un.S_addr;
+					// Cast the generic sockaddr to a specific sockaddr_in for IPv4
+					struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)res->ai_addr;
+
+					// Access the IP address directly and safely
+					*ip = ipv4_addr->sin_addr.s_addr;
 					result = true;
 				}
 			}
