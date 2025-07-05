@@ -186,7 +186,7 @@ string ExecutablePath()
 			if (file_pt)
 			{
 				*file_pt = L'\0';
-				RightTrim(result, result->buffer_len - ((char*)file_pt - result->buffer));
+				RightTrim(result, result->buffer_len - ((char*)file_pt - (char*)result->buffer));
 				return result;
 			}
 		}
