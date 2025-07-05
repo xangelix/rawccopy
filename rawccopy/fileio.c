@@ -74,7 +74,7 @@ bool AppendBytesFromDiskRdr(disk_reader dr, int64_t offset, uint64_t cnt, bytes 
 	if (offset != dr->offset)
 	{
 		uint32_t low = offset & 0x0000000000FFFFFFFF;
-		uint32_t high = offset >> 32;
+        LONG high = (LONG)(offset >> 32);
 		SetFilePointer(dr->fh, low, &high, FILE_BEGIN);
 	}
 
