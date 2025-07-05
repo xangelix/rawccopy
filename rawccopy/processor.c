@@ -210,8 +210,9 @@ bool WriteAttributeContent(execution_context context, mft_file file, attribute a
 		if (!context->writer)
 			return false;
 	}
-
-	wprintf(context->parameters->tcp_send ? L"Tcpsending: %ls\n" : L"Writing: %ls\n", BaseString(file_name));
+	if (!context->parameters->quiet_mode) {
+		wprintf(context->parameters->tcp_send ? L"Tcpsending: %ls\n" : L"Writing: %ls\n", BaseString(file_name));
+	}
 
 	attribute_reader rdr = OpenAttributeReader(context, file, at);
 	bytes read_buffer = CreateEmpty();

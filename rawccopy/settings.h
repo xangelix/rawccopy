@@ -23,6 +23,7 @@ typedef struct _settings {
 	string source_drive;
 	uint64_t image_offs;
 	uint64_t* mft_ref;
+	bool quiet_mode;
 } *settings;
 
 settings Parse(int argc, char* argv[]);

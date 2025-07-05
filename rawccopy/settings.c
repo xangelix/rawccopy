@@ -25,8 +25,8 @@ settings Parse(int argc, char* argv[])
 		return NULL;
 	}
 	   
-	char* file_name_path, *out_path, *all_attr, *image_file, *image_volume, *raw_dir_mode, *write_fs_info, *out_name, *tcp_send;
-	file_name_path = out_path = all_attr = image_file = image_volume = raw_dir_mode = write_fs_info = out_name = tcp_send = NULL;
+	char* file_name_path, *out_path, *all_attr, *image_file, *image_volume, *raw_dir_mode, *write_fs_info, *out_name, *tcp_send, *quiet;
+	file_name_path = out_path = all_attr = image_file = image_volume = raw_dir_mode = write_fs_info = out_name = tcp_send = quiet = NULL;
 
 	for (int i = 1; i < argc; ++i)
 	{
@@ -48,10 +48,14 @@ settings Parse(int argc, char* argv[])
 			continue;
 		if (!tcp_send && match("/TcpSend:", argv[i], &tcp_send))
 			continue;
+		if (!quiet && match("/Quiet", argv[i], &quiet))
+			continue;
 	}
 
 	SafeCreate(result, settings);
 	memset(result, 0, sizeof(*result));
+
+	result->quiet_mode = (quiet != NULL);
 
 	result->tcp_send = (tcp_send && *tcp_send);
 
@@ -245,7 +249,7 @@ settings Parse(int argc, char* argv[])
 void PrintHelp()
 {
 	printf("Syntax:\n");
-	printf("RawCCopy /ImageFile:FullPath\\ImageFilename /ImageVolume:[1,2...n] /FileNamePath:FullPath\\Filename /OutputPath:FullPath /OutputName:FileName /AllAttr:[0|1] /RawDirMode:[0|1|2] /WriteFSInfo:[0|1]\n");
+	printf("RawCCopy /ImageFile:FullPath\\ImageFilename /ImageVolume:[1,2...n] /FileNamePath:FullPath\\Filename /OutputPath:FullPath /OutputName:FileName /AllAttr:[0|1] /RawDirMode:[0|1|2] /WriteFSInfo:[0|1] /Quiet\n");
 	printf("Examples:\n");
 	printf("RawCCopy /FileNamePath:c:\\hiberfil.sys /OutputPath:e:\\temp /OutputName:hiberfil_c.sys\n");
 	printf("RawCCopy /FileNamePath:c:\\pagefile.sys /OutputPath:e:\\temp /AllAttr:1\n");
