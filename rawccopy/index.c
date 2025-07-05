@@ -366,19 +366,22 @@ bool FileFlagsFromIndexRec(const index_entry rec, string dest)
 
 int CompareName(const void* name, const void* entry, void* context)
 {
+	wchar_t* current_name = (wchar_t*)name;
+
 	if ((*(index_entry*)entry)->index_flags & INDEX_ENTRY_END)
 		return -1;
 
-	for (wchar_t *ind_name = (wchar_t *)(*(index_entry*)entry)->filename;
-		  ind_name < (wchar_t *)(*(index_entry*)entry)->filename + (rsize_t)(*(index_entry*)entry)->filename_len;)
+	for (wchar_t* ind_name = (wchar_t*)(*(index_entry*)entry)->filename;
+		 ind_name < (wchar_t*)(*(index_entry*)entry)->filename + (rsize_t)(*(index_entry*)entry)->filename_len;)
 	{
-		if (!*((wchar_t*)name))
+		if (!*current_name)
 			//End of given name, but not index name:
 			return -1;
-		int dif = ((execution_context)context)->upper_case[*((wchar_t*)name)++] - ((execution_context)context)->upper_case[*ind_name++];
+
+		int dif = ((execution_context)context)->upper_case[*current_name++] - ((execution_context)context)->upper_case[*ind_name++];
 		if (dif != 0)
 			return dif;
 	}
 	//End of index name:
-	return !*((wchar_t*)name) ? 0 : 1;
+	return !*current_name ? 0 : 1;
 }
