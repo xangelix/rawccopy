@@ -85,19 +85,7 @@ rawccopy_stream* rawccopy_open(int argc, char* argv[]) {
 }
 
 int64_t rawccopy_read(rawccopy_stream* stream, uint8_t* buffer, uint64_t buffer_len) {
-    // ---- START: ADD THIS BLOCK ----
-    fprintf(stderr, "[DEBUG] ==> ENTERING rawccopy_read()\n");
-    if (stream) {
-        fprintf(stderr, "[DEBUG]     Stream Ptr: %p, Reader Position: %llu, Total Size: %llu\n",
-                (void*)stream, AttributeReaderPosition(stream->reader), stream->total_size);
-    } else {
-        fprintf(stderr, "[DEBUG]     Stream Ptr is NULL!\n");
-    }
-    fprintf(stderr, "[DEBUG]     Buffer Ptr: %p, Buffer Len: %llu\n", (void*)buffer, buffer_len);
-    // ---- END: ADD THIS BLOCK ----
-
     if (!stream || !buffer || AttributeReaderPosition(stream->reader) >= stream->total_size) {
-        fprintf(stderr, "[DEBUG] <== EXITING rawccopy_read() with 0 (EOF or invalid args)\n"); // ADD THIS LINE
         return 0;
     }
 
@@ -107,20 +95,11 @@ int64_t rawccopy_read(rawccopy_stream* stream, uint8_t* buffer, uint64_t buffer_
         bytes_to_read = bytes_remaining;
     }
     if (bytes_to_read == 0) {
-        fprintf(stderr, "[DEBUG] <== EXITING rawccopy_read() with 0 (no bytes to read)\n"); // ADD THIS LINE
         return 0;
     }
-    
-    // ---- START: ADD THIS BLOCK ----
-    fprintf(stderr, "[DEBUG]     Attempting to read %llu bytes via GetBytesFromAttribRdr()...\n", bytes_to_read);
+
     bytes read_data = GetBytesFromAttribRdr(stream->context, stream->reader, -1, bytes_to_read);
-    fprintf(stderr, "[DEBUG]     ...GetBytesFromAttribRdr() returned.\n");
-    fprintf(stderr, "[DEBUG]     read_data ptr: %p\n", (void*)read_data);
-    // ---- END: ADD THIS BLOCK ----
-
-
     if (!read_data) {
-        fprintf(stderr, "[DEBUG] <== EXITING rawccopy_read() with -1 (read error)\n"); // ADD THIS LINE
         return -1;
     }
 
@@ -131,9 +110,6 @@ int64_t rawccopy_read(rawccopy_stream* stream, uint8_t* buffer, uint64_t buffer_
     
     DeleteBytes(read_data);
 
-    // ---- START: ADD THIS LINE before returning ----
-    fprintf(stderr, "[DEBUG] <== EXITING rawccopy_read() with %lld bytes read\n", (long long)bytes_read);
-    // ---- END: ADD THIS LINE ----
     return (int64_t)bytes_read;
 }
 
