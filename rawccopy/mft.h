@@ -45,4 +45,6 @@ bytes GetBytesFromAttrib(execution_context context, mft_file mft_rec, const attr
 
 bool DoFixUp(bytes record, uint16_t sector_sz);
 
+uint64_t AttributeReaderPosition(const attribute_reader rdr);
+
 #endif //MFT_H

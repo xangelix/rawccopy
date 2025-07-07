@@ -738,3 +738,10 @@ int MFTIDCompare(const void* id, const void* mft, void *context)
 	uint64_t second = ((raw_mft_record)((*(bytes *)mft)->buffer))->mft_rec_number & 0x0000FFFFFFFFFFFF;
 	return first > second ? 1 : (first < second ? - 1 : 0);
 }
+
+uint64_t AttributeReaderPosition(const attribute_reader rdr)
+{
+    // Return the current byte position of the reader.
+    // Returns 0 if the reader is null, which is a safe default.
+    return rdr ? rdr->position : 0;
+}
