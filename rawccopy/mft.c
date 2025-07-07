@@ -326,14 +326,14 @@ bytes GetBytesFromAttrib(execution_context context, mft_file mft_rec, const attr
 
 bytes GetBytesFromAttribRdr(execution_context context, attribute_reader rdr, int64_t offset, uint64_t cnt)
 {
-	bytes result = CreateEmpty();
-	if (!result)
-		return NULL;
+    bytes result = CreateEmpty();
+    if (!result)
+        return NULL;
 
-	if (!AppendBytesFromAttribRdr(context, rdr, offset, cnt, result, 0))
-		return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "");
+    if (!AppendBytesFromAttribRdr(context, rdr, offset, cnt, result, 0))
+        return ErrorCleanUp((void (*)(void*))DeleteBytes, result, "");
 
-	return result;
+    return result;
 }
 
 bool AppendBytesFromAttribRdr(execution_context context, attribute_reader rdr, int64_t offset, uint64_t cnt, bytes dest, rsize_t pos)
@@ -355,24 +355,21 @@ bool AppendBytesFromAttribRdr(execution_context context, attribute_reader rdr, i
 	uint64_t start_pos = offset >= 0 ? offset : rdr->position;
 	if (start_pos >= AttributeSize(rdr->attrib))
 		return true;
-	uint64_t read_cnt = cnt = min(cnt, AttributeSize(rdr->attrib) - start_pos);
-	
-	if (rdr->attrib->non_resident && rdr->attrib->init_sz != rdr->attrib->real_sz)
-		read_cnt = max(0, (int64_t)rdr->attrib->init_sz - start_pos);
 
+    uint64_t bytes_to_read = min(cnt, AttributeSize(rdr->attrib) - start_pos);
 	bool result = true;
-	if (read_cnt > 0)
+	if (bytes_to_read > 0)
 	{
 		//There are freak cases out there, with compressed flag set, which are 
 		//resident => that shouldn't happen
 		if ((rdr->attrib->flags & ATTR_IS_COMPRESSED) && rdr->attrib->non_resident)
-			result = AppendCompressedBytesFromAttribRdr(context, rdr, offset, read_cnt, dest, pos);
+            result = AppendCompressedBytesFromAttribRdr(context, rdr, offset, bytes_to_read, dest, pos);
 		else
-			result = AppendNormalBytesFromAttribRdr(context, rdr, offset, read_cnt, dest, pos);
+            result = AppendNormalBytesFromAttribRdr(context, rdr, offset, bytes_to_read, dest, pos);
 	}
-	result = result && (dest->buffer_len == pos + read_cnt);
-	if (result && read_cnt < cnt)
-		SetBytes(dest, 0, dest->buffer_len, (rsize_t)(cnt - read_cnt));
+    result = result && (dest->buffer_len == pos + bytes_to_read);
+    if (result && bytes_to_read < cnt)
+        SetBytes(dest, 0, dest->buffer_len, (rsize_t)(cnt - bytes_to_read));
 
 	return result;
 }
@@ -413,8 +410,8 @@ bool AppendNormalBytesFromAttribRdr(execution_context context, attribute_reader 
 					SetBytes(dest, 0, dest->buffer_len, (rsize_t)delta);
 
 				rdr->position += delta;
-				if (dest->buffer_len >= pos + cnt)
-					break;
+                if (dest->buffer_len >= pos + cnt)
+                    break;
 			}
 		}
 		else
@@ -424,8 +421,8 @@ bool AppendNormalBytesFromAttribRdr(execution_context context, attribute_reader 
 			memcpy(dest->buffer + dest->buffer_len - delta, (char*)rdr->extent + rdr->extent->value_offs + rdr->position, (rsize_t)delta);
 			rdr->position += delta;
 		}
-		if (dest->buffer_len >= pos + cnt)
-			break;
+        if (dest->buffer_len >= pos + cnt)
+            break;
 	}
 	//For the moment still no error handling, all deviant cases should be caught in underlying
 	//functions and simply result in zero or not enough bytes being returned
